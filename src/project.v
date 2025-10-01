@@ -32,14 +32,4 @@ module tt_um_example (
         .q(uo_out)
     );
 
-
-
-
-  assign uo_out  = ui_in + uio_in;
-  assign uio_out = 0;
-  assign uio_oe  = 0;
-
-  wire _unused = &{ena, clk, rst_n, 1'b0};
-
-
 endmodule
