@@ -16,17 +16,22 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    // Instantiate 8-bit programmable counter
-    counter_8bit counter (
+    // Map some inputs to control signals
+    wire load      = ui_in[7];
+    wire [7:0] din = ui_in[7:0];
+
+    // Counter instance
+    wire [7:0] count_val;
+
+    counter8 u_counter (
         .clk(clk),
         .rst_n(rst_n),
         .load(load),
-        .en(en),
-        .up_down(up_down),
-        .data_in(data_in),
-        .q(q)
+        .data_in(din),
+        .ena(ena),
+        .count(count_val),
+        .uo_out(uo_out)   // drive outputs directly
     );
-
 
 
 
