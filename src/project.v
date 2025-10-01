@@ -28,9 +28,9 @@ module tt_um_example (
         .rst_n(rst_n),
         .load(load),
         .data_in(din),
-        .ena(ena),
-        .count(count_val),
-        .uo_out(uo_out)   // drive outputs directly
+        .en(ena),
+        .data_in(count_val),
+        .q(uo_out)   // drive outputs directly
     );
 
 
