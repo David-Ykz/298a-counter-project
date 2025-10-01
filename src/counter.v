@@ -3,7 +3,7 @@ module counter_8bit (
     input  wire        rst_n,     // Active-low asynchronous reset
     input  wire        load,      // Synchronous load enable
     input  wire        en,        // Output enable for tri-state
-    input  wire        up_down,   // 1 = count up, 0 = count down
+    input  wire        up_down,   // 1 for count up
     input  wire [7:0]  data_in,   // Load value
     output wire [7:0]  q          // Tri-state output
 );
