@@ -8,33 +8,47 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
+    dut._log.info("Start counter test")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
+    # Clock setup
+    clock = Clock(dut.clk, 10, units="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
-    dut._log.info("Reset")
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 2)
     dut.rst_n.value = 1
+    dut._log.info("Reset released")
 
-    dut._log.info("Test project behavior")
-
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
-
-    # Wait for one clock cycle to see the output values
+    # --- Load value 10 ---
+    dut.ui_in.value = 10
+    dut.uio_in.value = 0b01   # bit0=load=1, bit1=up_down=0 (don’t care)
+    await ClockCycles(dut.clk, 1)
+    dut.uio_in.value = 0b00   # clear load
     await ClockCycles(dut.clk, 1)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    assert int(dut.uo_out.value) == 10, f"Expected 10, got {int(dut.uo_out.value)}"
+    dut._log.info(f"Loaded value OK: {int(dut.uo_out.value)}")
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    # --- Count up for 5 cycles ---
+    dut.uio_in.value = 0b10   # bit1=up_down=1
+    await ClockCycles(dut.clk, 5)
+    expected = 10 + 5
+    assert int(dut.uo_out.value) == expected, f"Expected {expected}, got {int(dut.uo_out.value)}"
+    dut._log.info(f"Count up OK: {int(dut.uo_out.value)}")
+
+    # --- Count down for 3 cycles ---
+    dut.uio_in.value = 0b00   # bit1=up_down=0
+    await ClockCycles(dut.clk, 3)
+    expected = expected - 3
+    assert int(dut.uo_out.value) == expected, f"Expected {expected}, got {int(dut.uo_out.value)}"
+    dut._log.info(f"Count down OK: {int(dut.uo_out.value)}")
+
+    # --- Test tri-state (disable outputs) ---
+    dut.ena.value = 0
+    await ClockCycles(dut.clk, 1)
+    assert dut.uo_out.value.is_resolvable == False, "Expected high-Z on outputs when disabled"
+    dut._log.info("Tri-state output OK")
