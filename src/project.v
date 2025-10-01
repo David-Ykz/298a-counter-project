@@ -23,7 +23,7 @@ module tt_um_example (
     // Counter instance
     wire [7:0] count_val;
 
-    counter8 u_counter (
+    counter_8bit u_counter (
         .clk(clk),
         .rst_n(rst_n),
         .load(load),
